@@ -1,8 +1,8 @@
 # ConsoleTranslate
 ## 概要
-コマンドライン上で使える翻訳ツール
-node.js上で動作
-翻訳にはOpenAIのAPIを利用しています
+コマンドライン上で使える翻訳ツール <br>
+node.js上で動作 <br>
+翻訳にはOpenAIのAPIを利用しています <br>
 ```bash
 $ ctrans ja "Hello World"
 > ---------------------------------------------------------------------
@@ -29,7 +29,7 @@ ctrans ja "I am kamsean." -m gpt4
     "eo": "Esperanto",
     "tok": "Toki Pona"
 ```
-## インストール
+## インストール(Ubuntu22.04環境で確認)
 ※あらかじめhttps://platform.openai.com/ でOpenAIのAPIキーを発行しておいてください
 1. ダウンロードしたリポジトリに移動
 2. 依存関係のインストール
