@@ -22,13 +22,28 @@ const validateLanguage = (language: string) => {
     if (!languageMap[language]) {
         throw new Error("Invalid language code");
     }
-}
+};
 
 const validateModel = (model: string) => {
     if (!modelMap[model]) {
         throw new Error("Invalid model");
     }
-}
+};
+
+const respond = async (language: string, options: any, text: string, apiKey: string) => {
+    const languageName = languageMap[language];
+    validateLanguage(language);
+    const model = modelMap[options.model];
+    validateModel(options.model);
+    const { result, isSummarized } = await translate(text, languageName, model, apiKey);
+    console.log("---------------------------------------------------------------------");
+    if (isSummarized) {
+        console.log("The input content is extremely large. The result has been summarized.");
+        console.log("---------------------------------------------------------------------");
+    }
+    console.log(result);
+    console.log("---------------------------------------------------------------------");
+};
 
 const main = async () => {
     ensureAppDirectoryExists();
@@ -46,12 +61,7 @@ const main = async () => {
         .action(async (language, text, options) => {
             try {
                 const apiKey = getApiKey();
-                const languageName = languageMap[language];
-                validateLanguage(language);
-                const model = modelMap[options.model];
-                validateModel(options.model);
-                const response = await translate(text, languageName, model, apiKey);
-                console.log(response);
+                await respond(language, options, text, apiKey);
             }
             catch (error: any) {
                 console.error(`Error: ${error.message}`);
@@ -78,12 +88,7 @@ const main = async () => {
             );
             process.stdin.on("end", async () => {
                 try {
-                    const languageName = languageMap[language];
-                    validateLanguage(language);
-                    const model = modelMap[options.model];
-                    validateModel(options.model);
-                    const response = await translate(text, languageName, model, apiKey);
-                    console.log(response);
+                    await respond(language, options, text, apiKey);
                 }
                 catch (error: any) {
                     console.error(`Error: ${error.message}`);
@@ -107,6 +112,6 @@ const main = async () => {
         );
 
     program.parse();
-}
+};
 
 main();
