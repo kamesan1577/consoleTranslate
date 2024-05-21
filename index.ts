@@ -1,49 +1,30 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { translate } from "./utils";
-import { ensureAppDirectoryExists, loadConfig, getApiKey, setApiKey } from "./config";
+import * as openai from "./openai";
+import * as googletranslate from "./googleTranslate";
+import { ensureAppDirectoryExists, loadConfig, getOpenAIApiKey, setOpenAIApiKey, getGoogleApiKey, setGoogleApiKey, getDefaultProvider, setDefaultProvider } from "./config";
 
+const respond = async (language: string, options: any, text: string, provider: string) => {
 
-const languageMap: { [key: string]: string } = {
-    "en": "English",
-    "ja": "Japanese",
-    "cn": "Chinese",
-    "eo": "Esperanto",
-    "tok": "Toki Pona"
-};
+    if (provider === "openai") {
+        let model = options.model;
+        if (!model) {
+            model = "gpt3.5";
+        }
+        const credential = getOpenAIApiKey();
+        openai.validateModel(model);
 
-const modelMap: { [key: string]: string } = {
-    "gpt3.5": "gpt-3.5-turbo-1106",
-    "gpt4": "gpt-4-0125-preview"
-};
-
-const validateLanguage = (language: string) => {
-    if (!languageMap[language]) {
-        throw new Error("Invalid language code");
+        const { result, isSummarized } = await openai.translate(text, language, model, credential);
+        return { result, isSummarized };
+    } else if (provider === "google") {
+        const credential = getGoogleApiKey();
+        const { result, isSummarized } = await googletranslate.translate(text, language, credential);
+        return { result, isSummarized };
+    } else {
+        throw new Error("Invalid provider");
     }
-};
-
-const validateModel = (model: string) => {
-    if (!modelMap[model]) {
-        throw new Error("Invalid model");
-    }
-};
-
-const respond = async (language: string, options: any, text: string, apiKey: string) => {
-    const languageName = languageMap[language];
-    validateLanguage(language);
-    const model = modelMap[options.model];
-    validateModel(options.model);
-    const { result, isSummarized } = await translate(text, languageName, model, apiKey);
-    console.log("---------------------------------------------------------------------");
-    if (isSummarized) {
-        console.log("The input content is extremely large. The result has been summarized.");
-        console.log("---------------------------------------------------------------------");
-    }
-    console.log(result);
-    console.log("---------------------------------------------------------------------");
-};
+}
 
 const main = async () => {
     ensureAppDirectoryExists();
@@ -57,11 +38,24 @@ const main = async () => {
     program
         .command("* <language> <text>")
         .description("Translate text to a given language")
-        .option("-m, --model <model>", "Model to use for translation", "gpt3.5")
+        .option("-m, --model <model>", "Model to use for translation")
+        .option("-p, --provider <provider>", "Translation provider(openai or google)")
         .action(async (language, text, options) => {
             try {
-                const apiKey = getApiKey();
-                await respond(language, options, text, apiKey);
+                let provider = options.provider;
+                if (!provider) {
+                    provider = getDefaultProvider();
+                }
+                const { result, isSummarized } = await respond(language, options, text, provider);
+                console.log("---------------------------------------------------------------------");
+                console.log("Provider: " + provider);
+                console.log("---------------------------------------------------------------------");
+                if (isSummarized) {
+                    console.log("The input content is extremely large. The result has been summarized.");
+                    console.log("---------------------------------------------------------------------");
+                }
+                console.log(result);
+                console.log("---------------------------------------------------------------------");
             }
             catch (error: any) {
                 console.error(`Error: ${error.message}`);
@@ -73,9 +67,9 @@ const main = async () => {
     program
         .command("stdin <language>")
         .description("Translate text from standard input to a given language")
-        .option("-m, --model <model>", "Model to use for translation", "gpt3.5")
+        .option("-m, --model <model>", "Model to use for translation")
+        .option("-p, --provider <provider>", "Translation provider to use (openai or googletranslate)", "openai")
         .action((language, options) => {
-            const apiKey = getApiKey();
             let text = "";
 
             process.stdin.setEncoding("utf8");
@@ -88,7 +82,20 @@ const main = async () => {
             );
             process.stdin.on("end", async () => {
                 try {
-                    await respond(language, options, text, apiKey);
+                    let provider = options.provider;
+                    if (!provider) {
+                        provider = getDefaultProvider();
+                    }
+                    const { result, isSummarized } = await respond(language, options, text, provider);
+                    console.log("---------------------------------------------------------------------");
+                    console.log("Provider: " + provider);
+                    console.log("---------------------------------------------------------------------");
+                    if (isSummarized) {
+                        console.log("The input content is extremely large. The result has been summarized.");
+                        console.log("---------------------------------------------------------------------");
+                    }
+                    console.log(result);
+                    console.log("---------------------------------------------------------------------");
                 }
                 catch (error: any) {
                     console.error(`Error: ${error.message}`);
@@ -98,11 +105,11 @@ const main = async () => {
         });
 
     program
-        .command("set-api-key <apiKey>")
-        .description("Set OpenAI API key in the .env file")
+        .command("set-openai-api-key <apiKey>")
+        .description("Set OpenAI API key in config")
         .action((apiKey) => {
             try {
-                setApiKey(apiKey);
+                setOpenAIApiKey(apiKey);
             }
             catch (error: any) {
                 console.error(`Error: ${error.message}`);
@@ -111,6 +118,33 @@ const main = async () => {
         }
         );
 
+    program
+        .command("set-google-api-key <apiKey>")
+        .description("Set Google API key in config")
+        .action((apiKey) => {
+            try {
+                setGoogleApiKey(apiKey);
+            }
+            catch (error: any) {
+                console.error(`Error: ${error.message}`);
+                process.exit(1);
+            }
+        }
+        );
+
+    program
+        .command("set-default-provider <provider>")
+        .description("Set default translation provider in config")
+        .action((provider) => {
+            try {
+                setDefaultProvider(provider);
+            }
+            catch (error: any) {
+                console.error(`Error: ${error.message}`);
+                process.exit(1);
+            }
+        }
+        );
     program.parse();
 };
 

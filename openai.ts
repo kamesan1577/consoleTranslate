@@ -1,6 +1,31 @@
 import { OpenAI } from 'openai';
+import { validateLanguage } from './validation';
 
-export const translate = async (text: string, language: string, model: string, apiKey: string) => {
+export const languageMap: { [key: string]: string } = {
+    "en": "English",
+    "ja": "Japanese",
+    "cn": "Chinese",
+    "eo": "Esperanto",
+    "tok": "Toki Pona"
+};
+
+
+export const modelMap: { [key: string]: string } = {
+    "gpt3.5": "gpt-3.5-turbo-1106",
+    "gpt4": "gpt-4-turbo",
+    "gpt4o": "gpt-4o"
+};
+
+export const validateModel = (model: string) => {
+    if (!modelMap[model]) {
+        throw new Error("Invalid model");
+    }
+};
+
+
+export const translate = async (text: string, language: string, model: string, credential: string) => {
+    validateLanguage(language, languageMap);
+
     const systemPrompt = `
     You are a language translator.
     Translate the following text to ${language}.
@@ -12,12 +37,12 @@ export const translate = async (text: string, language: string, model: string, a
 
     try {
         const openAi = new OpenAI({
-            apiKey: apiKey
+            apiKey: credential
         })
 
         const response = await openAi.chat.completions.create(
             {
-                model: model,
+                model: modelMap[model],
                 messages: [
                     {
                         role: "system",
