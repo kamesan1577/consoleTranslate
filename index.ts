@@ -68,10 +68,9 @@ const main = async () => {
         .command("stdin <language>")
         .description("Translate text from standard input to a given language")
         .option("-m, --model <model>", "Model to use for translation")
-        .option("-p, --provider <provider>", "Translation provider to use (openai or googletranslate)", "openai")
+        .option("-p, --provider <provider>", "Translation provider to use (openai or googletranslate)")
         .action((language, options) => {
             let text = "";
-
             process.stdin.setEncoding("utf8");
             process.stdin.on("readable", () => {
                 let chunk;
