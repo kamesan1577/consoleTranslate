@@ -21,7 +21,8 @@ echo "I am kamesan." | ctrans stdin ja
 # OpenAIを利用する場合は-mオプションでGPTのバージョンを指定可能
 ctrans ja "I am kamsean." -m gpt4
 
-# 
+# 　利用する翻訳ツールを選択可能
+ctrans ja "I use google." -p google
 ```
 現時点では以下の言語への翻訳に対応(その気になればどんな言語でも対応できるけど)
 ```
@@ -47,17 +48,17 @@ $ npm i -g .
 ```
 6. APIキーの登録
 ```bash
-//OpenAIを使う場合
-//※あらかじめhttps://platform.openai.com/ でOpenAIのAPIキーを発行しておいてください
+// OpenAIを使う場合
+// ※あらかじめhttps://platform.openai.com/ でOpenAIのAPIキーを発行しておいてください
 $ ctrans set-openai-api-key <APIキー>
 
-//Google翻訳を使う場合
-//※あらかじめGoogle CloudでCloudTranslationの APIが使えるAPIキーを発行しておいてください
+// Google翻訳を使う場合
+// ※あらかじめGoogle CloudでCloudTranslationの APIが使えるAPIキーを発行しておいてください
 $ ctrans set-google-api-key <APIキー>
 ```
 7. デフォルトの翻訳ツールを設定する
 ```bash
-//特に設定しないとopenaiが利用されます
+// 特に設定しないとopenaiが利用されます
 $ ctrans set-default-provider <openai | google>
 ```
 8. つかってみる
