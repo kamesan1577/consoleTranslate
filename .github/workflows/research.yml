@@ -20,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
@@ -31,8 +31,7 @@ jobs:
           echo ${{ secrets.CONFIG_JSON }} > ~/.consoleTransrate/config.json
 
       - name: Run Jest tests
-        run: npx jest
-
+        run: npm test --outputFile=jest-results.json
       - name: Upload Jest Test Results
         uses: actions/upload-artifact@v2
         with:
