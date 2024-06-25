@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "npx jest"
+    "test": "npx jest --outputFile=jest-results.json --json"
   },
   "author": "",
   "license": "MIT",
@@ -24,6 +24,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.24",
     "jest": "^29.7.0",
+    "jest-sonar-reporter": "^2.0.0",
     "ts-jest": "^29.1.5"
   }
 }
