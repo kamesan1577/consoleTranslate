@@ -8,8 +8,8 @@ export const languageMap: { [key: string]: string } = {
 
 
 export const translate = async (text: string, language: string, credential: string) => {
-    validateLanguage(language, languageMap);
     try {
+        validateLanguage(language, languageMap);
         const translateClient = new Translate({ key: credential });
         const [translations] = await translateClient.translate(text, language);
 
@@ -21,8 +21,16 @@ export const translate = async (text: string, language: string, credential: stri
         };
     }
     catch (error: any) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
+        // console.log(error);
+        if (error.message === "Invalid language code") {
+            throw new Error("Invalid language code");
+        }
+        else if (error.message === "API key not valid. Please pass a valid API key.") {
+            throw new Error("Invalid API key");
+        }
+        else {
+            throw new Error("An error occurred while translating the text");
+        }
     }
 };
 

@@ -64,8 +64,14 @@ export const translate = async (text: string, language: string, model: string, c
         return { result, isSummarized };
     }
     catch (error: any) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
+        // console.log(error);
+        if (error.message === "Invalid language code") {
+            throw new Error("Invalid language code");
+        }
+        // TODO APIキーのエラーメッセージを追加
+        else {
+            throw new Error("An error occurred while translating the text");
+        }
     }
 }
 

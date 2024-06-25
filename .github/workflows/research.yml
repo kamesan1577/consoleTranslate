@@ -1,0 +1,40 @@
+# 卒業研究用のワークフロー
+name: Run Tests and Process Results
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Jest tests
+        run: npm test -- --outputFile=jest-results.json --json
+
+      - name: Upload Jest Test Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: jest-results
+          path: jest-results.json
+
+      - name: Process Jest Test Results
+        uses: kamesan1577/ci-gamificator@v0
+        with:
+          artifact-name: "jest-results"
