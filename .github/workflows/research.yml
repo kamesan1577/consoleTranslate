@@ -28,7 +28,7 @@ jobs:
       - name: Write consoleTransrate config
         run: |
           mkdir -p ~/.consoleTransrate
-          echo "${{ secrets.CONFIG_JSON }}" > ~/.consoleTransrate/config.json
+          echo ${{ secrets.CONFIG_JSON }} > ~/.consoleTransrate/config.json
 
       - name: Run Jest tests
         run: npx jest
