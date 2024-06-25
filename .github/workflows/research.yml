@@ -39,6 +39,6 @@ jobs:
           path: jest-results.json
 
       - name: Process Jest Test Results
-        uses: kamesan1577/ci-gamificator@v0.5
+        uses: kamesan1577/ci-gamificator@v0.6
         with:
           artifact-name: "jest-results"
