@@ -33,12 +33,13 @@ jobs:
       - name: Run Jest tests
         run: npm test --outputFile=jest-results.json
       - name: Upload Jest Test Results
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: jest-results
           path: jest-results.json
 
       - name: Process Jest Test Results
-        uses: kamesan1577/ci-gamificator@v0.9
+        uses: kamesan1577/ci-gamificator@v0.10
         with:
-          artifact-name: "jest-results"
+          artifact-id: ${{ steps.upload.outputs.artifact-id }}
