@@ -43,3 +43,4 @@ jobs:
         uses: kamesan1577/ci-gamificator@main
         with:
           artifact-id: ${{ steps.upload.outputs.artifact-id }}
+          contributor: ${{ github.actor }}
