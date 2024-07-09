@@ -5,7 +5,7 @@ import * as openai from "./openai";
 import * as googletranslate from "./googleTranslate";
 import { ensureAppDirectoryExists, loadConfig, getOpenAIApiKey, setOpenAIApiKey, getGoogleApiKey, setGoogleApiKey, getDefaultProvider, setDefaultProvider } from "./config";
 
-const respond = async (language: string, options: any, text: string, provider: string) => {
+export const respond = async (language: string, options: any, text: string, provider: string) => {
 
     if (provider === "openai") {
         let model = options.model;
@@ -26,7 +26,7 @@ const respond = async (language: string, options: any, text: string, provider: s
     }
 }
 
-const main = async () => {
+export const main = async () => {
     ensureAppDirectoryExists();
     await loadConfig();
     const program = new Command();
@@ -34,12 +34,12 @@ const main = async () => {
     program
         .name("translate")
         .description("Translate text to a given language")
+        .option("-m, --model <model>", "Model to use for translation")
+        .option("-p, --provider <provider>", "Translation provider to use (openai or googletranslate)")
 
     program
         .command("* <language> <text>")
         .description("Translate text to a given language")
-        .option("-m, --model <model>", "Model to use for translation")
-        .option("-p, --provider <provider>", "Translation provider(openai or google)")
         .action(async (language, text, options) => {
             try {
                 let provider = options.provider;
@@ -67,8 +67,6 @@ const main = async () => {
     program
         .command("stdin <language>")
         .description("Translate text from standard input to a given language")
-        .option("-m, --model <model>", "Model to use for translation")
-        .option("-p, --provider <provider>", "Translation provider to use (openai or googletranslate)")
         .action((language, options) => {
             let text = "";
             process.stdin.setEncoding("utf8");

@@ -30,6 +30,7 @@ const initConfig = () => {
 export const loadConfig = async () => {
     try {
         if (!fs.existsSync(configFilePath)) {
+            console.log("Config file not found. Creating new config file.");
             initConfig();
         }
         const data = await fs.promises.readFile(configFilePath, 'utf-8');
